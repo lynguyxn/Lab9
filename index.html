@@ -55,18 +55,115 @@
     <button>Trigger a Global Error</button>
   </section>
 
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>             
   <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "17bca58dd20a4090b3e110d6d661a397"
+    });
+
+    class InputError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "InputError";
+      }
+    }
+
     let calculateBtn = document.querySelector('#calculate');
     calculateBtn.addEventListener('click', () => {
       let output = document.querySelector('output');
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+
+      try {
+        let firstNullCheck = firstNum === "";
+        let secondNullCheck = secondNum === "";
+
+        if (firstNullCheck && secondNullCheck) {
+          throw new InputError("First and second numbers are missing");
+        } else if (firstNullCheck) {
+          throw new InputError("First number is missing");
+        } else if (secondNullCheck) {
+          throw new InputError("Second number is missing");
+        }
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        console.log("Finished try catch block");
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
     // TODO - Make buttons functional
+    errorBtns[0].addEventListener('click', () => {
+      console.log("Console Log Demo");
+      console.log(`The first number is ${document.querySelector('#first-num').value}`);
+      console.log(`The second number is ${document.querySelector('#second-num').value}`);
+    });
+
+    errorBtns[1].addEventListener('click', () => {
+      console.error('Console Error Demo');
+    });
+
+    errorBtns[2].addEventListener('click', () => {
+      console.dir(errorBtns);
+    });
+
+    errorBtns[3].addEventListener('click', () => {
+      console.dirxml(document);
+    });
+
+    errorBtns[4].addEventListener('click', () => {
+      console.group("Group Start");
+      console.log("We are in a group")
+    });
+
+    errorBtns[5].addEventListener('click', () => {
+      console.groupEnd();
+      console.log("Exited group")
+    });
+
+    errorBtns[6].addEventListener('click', () => {
+      console.table([
+        {
+          Drink: "White Peach Oolong Tea",
+          AddOns: "Lychee Jelly"
+        },
+        {
+          Drink: "Honeydew Green Tea",
+          AddOns: "Basil Seeds"
+        }
+      ]);
+    });
+
+    errorBtns[7].addEventListener('click', () => {
+      console.time();
+      console.log("Timer started")
+    });
+
+    errorBtns[8].addEventListener('click', () => {
+      console.timeEnd();
+      console.log("Timer ended")
+    });
+
+    errorBtns[9].addEventListener('click', () => {
+      const booooba = () => { boooba(); };
+      const boooba = () => { booba(); };
+      const booba = () => { boba(); };
+      const boba = () => { console.trace(); };
+      booooba();
+    });
+
+    window.onerror = function(msg, url, lineNo, columnNo, error) {
+      console.error(error);
+      return false;
+    }
+
+    errorBtns[10].addEventListener('click', () => {
+      console.log("GLOBAL ERROR OCCURED!!");
+      const result = boom + 1;
+    });
   </script>
 </body>
 </html>
